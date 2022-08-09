@@ -48,7 +48,7 @@ if __name__ == '__main__':
     e_d = -0.2 # LUMO energy [eV]
     e_a = 0.4 # LUMO+1 energy [eV]
 
-    gamL = 0.2 #e
+    gamL = 0.2 #eV
     gamR = 0.2 #eV
     gam_phonon = 0.1
 

@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     #kk, ww, bb = np.meshgrid(kappa_grid, w0_grid, beta_grid)
 
-    e_grid = np.linspace(-4,4,10000)
+    e_grid = np.linspace(-5,5,20000)
 
     k_LR_01 = np.zeros((kappa_grid.shape[0], w0_grid.shape[0], beta_grid.shape[0]))
     k_RL_01 = np.zeros((kappa_grid.shape[0], w0_grid.shape[0], beta_grid.shape[0]))
