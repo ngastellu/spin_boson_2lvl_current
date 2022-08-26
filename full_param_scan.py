@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson
+from time import perf_counter
 
 
 def lor(e,gamma,e0):
@@ -15,27 +16,33 @@ def fermi_dirac(e,mu,beta):
     return 1.0 / ( np.exp(beta*(e-mu)) + 1 )
 
 def transfer_rate(e,mu,gamma_i,gamma_f,e_i,e_f,beta,kappa,w):
+    print('Evaluating Lorentzians...')
+    lor_start = perf_counter()
     lor_i = lor(e,gamma_i,e_i) 
-    print(lor_i.shape)
     lor_f = lor(e+w,gamma_f,e_f)
-    print(lor_f.shape)
+    lor_end = perf_counter()
+    print('Done with Lorentzians. Computation time [seconds] = ', lor_end - lor_start)
 
 
+    print('Evaluating Fermi Dirac distributions...')
+    fd_start = perf_counter()
     fd_i = fermi_dirac(e,mu,beta)
-    print(fd_i.shape)
     cfd_f = 1 - fermi_dirac(e+w,-mu,beta)
-    print(cfd_f.shape)
-    print(kappa.shape)
+    fd_end = perf_counter()
+    print('Done with Fermi Dirac distributions. Computation time [seconds] = ', fd_end - fd_start)
 
     prefactor = kappa*kappa
     print(prefactor.shape)
+    print('Evaluating integral...')
+    int_start = perf_counter()
     integral = simpson(lor_i*lor_f*fd_i*cfd_f, e, axis=-1)
-    print(integral.shape)
+    int_end = perf_counter()
+    print('Done with integral. Computation time [seconds] = ', int_end - int_start)
     out = prefactor[:,None,None]*integral
 
     print(out.shape)
 
-    return out
+    return out / (2.0*np.pi)
 
 
 # ****** MAIN ******
@@ -48,15 +55,18 @@ if __name__ == '__main__':
     e_d = -0.2 # LUMO energy [eV]
     e_a = 0.4 # LUMO+1 energy [eV]
 
-    gamL = 0.2 #e
+    gamL = 0.2 #eV
     gamR = 0.2 #eV
     gam_phonon = 0.1
 
-    kappa_grid = np.linspace(0.1,1.0,10)
-    w0_grid = np.linspace(0.1,1.0,10)
-    #muL_grid = np.linspace(-1,0.25,20) #muR = -muL always
-    muL_grid = np.ones(20)*0.4
-    temp_grid = np.linspace(40,4000,200)
+    kappa_grid = np.linspace(0.1,1.0,11)
+    #kappa_grid = np.ones(2) * 0.1
+    w0_grid = np.linspace(0.01,1.0,21)
+    #w0_grid = np.ones(3) * 0.05
+
+    muL_grid = np.linspace(-0.5,1,51) #muR = -muL always
+    #muL_grid = np.ones(4)*0.4
+    temp_grid = np.linspace(40,400,200)
 
     beta_grid = 1.0 / (kB * temp_grid)
     e_grid = np.linspace(-5,5,20000)
@@ -73,20 +83,28 @@ if __name__ == '__main__':
 
 
     for j, ww in enumerate(w0_grid):
+        print('\n')
         print(j)
 
-        k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d,e_a,bb,kappa_grid,ww)
-        k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a,e_d,bb,kappa_grid,ww)
+        #k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+2*mm,e_a-2*mm,bb,kappa_grid,-ww)
+        #k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-2*mm,e_d+2*mm,bb,kappa_grid,-ww)
 
-        k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d,e_a,bb,kappa_grid,-ww)
-        k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a,e_d,bb,kappa_grid,-ww)
+        #k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+2*mm,e_a-2*mm,bb,kappa_grid,ww)
+        #k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-2*mm,e_d+2*mm,bb,kappa_grid,ww)
 
-    plt.plot(temp_grid,k_RL_01[0,0,0,:],'r-',lw=0.8)
-    plt.plot(temp_grid,k_LR_01[0,0,0,:],'b-',lw=0.8)
-    plt.plot(temp_grid,k_RL_10[0,0,0,:],'r--',lw=0.8)
-    plt.plot(temp_grid,k_LR_10[0,0,0,:],'b--',lw=0.8)
+        k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,-ww)
+        k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,-ww)
+
+        k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,ww)
+        k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,ww)
+
+    plt.plot(temp_grid,k_RL_01[0,0,-1,:],'b-',lw=0.8,label='RL 01')
+    plt.plot(temp_grid,k_LR_01[0,0,-1,:],'r-',lw=0.8,label='LR 01')
+    plt.plot(temp_grid,k_RL_10[0,0,-1,:],'b--',lw=0.8,label='RL 10')
+    plt.plot(temp_grid,k_LR_10[0,0,-1,:],'r--',lw=0.8, label='RL 10')
     plt.xlabel('T [K]')
     plt.ylabel('Electron transfer rate [Hz]')
+    plt.legend()
     plt.show()
 
     np.save('full_kLR01.npy',k_LR_01)
@@ -105,8 +123,8 @@ if __name__ == '__main__':
 
     np.save('full_current_non-dis.npy', current)
 
-    plt.plot(temp_grid,current[0,9,0,:],'b-',lw=0.8)
-    plt.plot(temp_grid,current[9,9,0,:],'r-',lw=0.8)
+    plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
+    plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)
     plt.plot(temp_grid,current[0,0,0,:],'g-',lw=0.8)
     plt.xlabel('T [K]')
     plt.ylabel('Current [Hz]')
@@ -114,18 +132,18 @@ if __name__ == '__main__':
     
     #dissipative mode
 
-
-    ww, bb = np.meshgrid(w0_grid, beta_grid, indexing='ij')
+    ww, bb = np.meshgrid(w0_grid, beta_grid, indexing='ij',sparse=True)
     nph = bose_einstein(ww, bb)
     print(nph.shape)
-    p1 = (k_01 + gam_phonon * nph[:, None, None, :]) / (k_01 + k_10 + gam_phonon * (2* nph[: None, None,:] + 1))
+    p1 = (k_01 + gam_phonon * nph[:, None, None, :]) / (k_01 + k_10 + gam_phonon * (2* nph[:, None, None, :] + 1))
     p0 = 1 - p1
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
+    np.save('full_nph.npy',nph)
     np.save('full_current_dis.npy', current)
 
-    plt.plot(temp_grid,current[0,9,0,:],'b-',lw=0.8)
-    plt.plot(temp_grid,current[9,9,0,:],'r-',lw=0.8)
+    plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
+    plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)
     plt.plot(temp_grid,current[0,0,0,:],'g-',lw=0.8)
     plt.xlabel('T [K]')
     plt.ylabel('Current [Hz]')
