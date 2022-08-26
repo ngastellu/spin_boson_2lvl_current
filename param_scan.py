@@ -90,13 +90,13 @@ if __name__ == '__main__':
 
                 tm = np.zeros(4)
 
-                k_LR_01[i,j,k], tm[:] = transfer_rate(e_grid,muL,muR,gamL,gamR,e_d,e_a,bb,kk,ww,1)
-                k_RL_01[i,j,k] = transfer_rate(e_grid,muR,muL,gamR,gamL,e_a,e_d,bb,kk,ww)
+                k_LR_01[i,j,k], tm[:] = transfer_rate(e_grid,muL,muR,gamL,gamR,e_d+2*muL,e_a-2*muL,bb,kk,-ww,1)
+                k_RL_01[i,j,k] = transfer_rate(e_grid,muR,muL,gamR,gamL,e_a-2*muL,e_d+2*muL,bb,kk,-ww)
 
 
-                k_LR_10[i,j,k] = transfer_rate(e_grid,muL,muR,gamL,gamR,e_d,e_a,bb,kk,-ww)
+                k_LR_10[i,j,k] = transfer_rate(e_grid,muL,muR,gamL,gamR,e_d+2*muL,e_a-2*muL,bb,kk,ww)
                 #k_RL_10[i,j,k], mins[i,j,k,:] = transfer_rate(e_grid,muR,muL,e_a,e_d,gamR,gamL,bb,kk,-ww,1)
-                k_RL_10[i,j,k] = transfer_rate(e_grid,muR,muL,gamR,gamL,e_a,e_d,bb,kk,-ww)
+                k_RL_10[i,j,k] = transfer_rate(e_grid,muR,muL,gamR,gamL,e_a-2*muL,e_d+2*muL,bb,kk,ww)
                 #k_RL_10[i,j,k], tm[:] = transfer_rate(e_grid,muR,muL,e_a,e_d,gamR,gamL,bb,kk,-ww,1)
                 diffs = (tm - mins < 0)
                 mins[diffs] = tm[diffs]
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     #dissipative mode
 
 
-    bb, ww = np.meshgrid(beta_grid, w0_grid)
+    ww, bb = np.meshgrid(w0_grid, beta_grid, indexing='ij',sparse=True)
     nph = bose_einstein(ww, bb)
     print(nph.shape)
     p1 = (k_01 + gam_phonon * nph[None, :, :]) / (k_01 + k_10 + gam_phonon * (2* nph[None,:,:] + 1))
@@ -151,6 +151,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
+    np.save('nph.npy',nph)
     np.save('current_dis.npy', current)
 
     plt.plot(temp_grid,current[0,9,:],'b-',lw=0.8)
@@ -158,6 +159,4 @@ if __name__ == '__main__':
     plt.plot(temp_grid,current[0,0,:],'g-',lw=0.8)
     plt.xlabel('T [K]')
     plt.ylabel('Current []')
-    plt.show()
-
-    
+    plt.show() 
