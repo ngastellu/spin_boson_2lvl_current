@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson
 from time import perf_counter
+from os import path
 
 
 def lor(e,gamma,e0):
@@ -52,14 +53,24 @@ if __name__ == '__main__':
 
     kB = 8.617e-5 # eV/K
 
-    e_d = -0.2 # LUMO energy [eV]
-    e_a = 0.4 # LUMO+1 energy [eV]
+    datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
 
-    gamL = 0.2 #eV
-    gamR = 0.2 #eV
+    LUMO_file = path.join(datadir,'LUMO_energy_Gammas_80000-81000-2.npy')
+    LUMOp1_file = path.join(datadir,'LUMO+1_energy_Gammas_80000-81000-2.npy')
+
+    LUMO_data = np.load(LUMO_file)
+    LUMOp1_data = np.load(LUMOp1_file)
+
+    
+
+    e_d = np.mean(LUMO_data[1,:]) #-0.2 # LUMO energy [eV]
+    e_a = np.mean(LUMOp1_data[1,:]) #0.4 # LUMO+1 energy [eV]
+
+    gamL = np.mean(LUMO_data[2,:]) #avg coupling of LUMO to top edge of MAC structure #0.2 #eV
+    gamR = np.mean(LUMOp1_data[3,:]) #avg coupling of LUMO+1 to bottom edge of MAC structure #0.2 #eV
     gam_phonon = 0.1
 
-    kappa_grid = np.linspace(0.1,1.0,11)
+    kappa_grid = np.linspace(0.01,0.1,11)
     #kappa_grid = np.ones(2) * 0.1
     w0_grid = np.linspace(0.01,1.0,21)
     #w0_grid = np.ones(3) * 0.05
@@ -74,7 +85,6 @@ if __name__ == '__main__':
     mm, bb, ee = np.meshgrid(muL_grid,beta_grid,e_grid,indexing='ij',sparse=True)
 
     output_shape = (w0_grid.shape[0], kappa_grid.shape[0], muL_grid.shape[0], beta_grid.shape[0])
-
 
     k_LR_01 = np.zeros(output_shape)
     k_RL_01 = np.zeros(output_shape)
@@ -107,10 +117,10 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    np.save('full_kLR01.npy',k_LR_01)
-    np.save('full_kLR10.npy',k_LR_10)
-    np.save('full_kRL01.npy',k_RL_01)
-    np.save('full_kRL10.npy',k_RL_10)
+    np.save('MAC_kLR01.npy',k_LR_01)
+    np.save('MAC_kLR10.npy',k_LR_10)
+    np.save('MAC_kRL01.npy',k_RL_01)
+    np.save('MAC_kRL10.npy',k_RL_10)
 
     k_01 = k_LR_01 + k_RL_01
     k_10 = k_LR_10 + k_RL_10
@@ -121,7 +131,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
-    np.save('full_current_non-dis.npy', current)
+    np.save('MAC_current_non-dis.npy', current)
 
     plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)
@@ -139,8 +149,7 @@ if __name__ == '__main__':
     p0 = 1 - p1
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
-    np.save('full_nph.npy',nph)
-    np.save('full_current_dis.npy', current)
+    np.save('MAC_current_dis.npy', current)
 
     plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)

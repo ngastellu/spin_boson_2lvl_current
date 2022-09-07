@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import plt_utils
+from matplotlib import rcParams
 
 def tensor_linregress(x,y,yaxis=-1):
     xavg = np.mean(x)
@@ -26,21 +27,23 @@ def tensor_linregress(x,y,yaxis=-1):
 
 # ********** MAIN ***********
 
+rcParams['font.size'] = 25
+rcParams['image.aspect'] = 'auto'
 
 kB = 8.617e-5
 #temp_grid = np.linspace(40,4000,200)
 temp_grid = np.linspace(40,400,200)
 beta_grid = 1.0 / (kB * temp_grid)
 dmu = 2.0*np.linspace(-0.5,1,51)
-kappa_grid = np.linspace(0.1,1.0,11)
+kappa_grid = np.linspace(0.01,0.1,11)
 w0_grid = np.linspace(0.01,1.0,21)
 
 #Ind = np.load('40-4000K/full_current_non-dis.npy')
-Ind = np.load('full_current_non-dis.npy')
+Ind = np.load('MAC_current_non-dis.npy')
 Gnd = Ind / dmu[None,None,:,None]
 
 #Id = np.load('40-4000K/full_current_dis.npy')
-Id = np.load('full_current_dis.npy')
+Id = np.load('MAC_current_dis.npy')
 Gd = Id / dmu[None,None,:,None]
 
 print(np.all(Id == Ind))
@@ -129,3 +132,7 @@ plt.ylabel('$\Delta\mu$ [eV]')
 plt.suptitle('Quality of power law fit of $G_{nd}$ vs. $\\beta$ assuming $\kappa = %f$ eV.\nShowing only fits with $r^2 > %f$.'%(kappa_grid[kappa_ind2],rtol))
 plt.colorbar()
 plt.show()
+
+
+for r in [r1,r2,r3,r4]:
+    print(np.sum(r**2    > rtol))

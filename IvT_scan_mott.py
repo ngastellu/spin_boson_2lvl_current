@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import plt_utils
+from matplotlib import rcParams
 
 def tensor_linregress(x,y,yaxis=-1):
     xavg = np.mean(x)
@@ -26,21 +27,23 @@ def tensor_linregress(x,y,yaxis=-1):
 
 # ********** MAIN ***********
 
+rcParams['font.size'] = 25
+rcParams['image.aspect'] = 'auto'
 
 kB = 8.617e-5
 #temp_grid = np.linspace(40,4000,200)
 temp_grid = np.linspace(40,400,200)
 beta_grid = 1.0 / (kB * temp_grid)
 dmu = 2.0*np.linspace(-0.5,1,51)
-kappa_grid = np.linspace(0.1,1.0,11)
+kappa_grid = np.linspace(0.01,0.1,11)
 w0_grid = np.linspace(0.01,1.0,21)
 
 #Ind = np.load('40-4000K/full_current_non-dis.npy')
-Ind = np.load('full_current_non-dis.npy')
+Ind = np.load('MAC_current_non-dis.npy')
 Gnd = Ind / dmu[None,None,:,None]
 
 #Id = np.load('40-4000K/full_current_dis.npy')
-Id = np.load('full_current_dis.npy')
+Id = np.load('MAC_current_dis.npy')
 Gd = Id / dmu[None,None,:,None]
 
 print(np.all(Id == Ind))
@@ -57,7 +60,7 @@ for d in range(4): # number of spatial dimensions (Mott's law)
     plt.plot(beta_grid**(1/(d+1)),logGd[-1,-1,0,:],label='dissipative')
     plt.xlabel('$\\beta^{1/%d}$'%(d+1))
     plt.ylabel('ln$\,G$')
-    plt.suptitle('Current vs temperature plot assuming $d=%d$ dimensions.'%d)
+    plt.suptitle('Conductance vs temperature plot assuming $d=%d$ dimensions.'%d)
     plt.legend()
     plt.show()
 
@@ -69,7 +72,7 @@ kappa_ind1 = 0
 kappa_ind2 = -1
 rtol = 0.95
 
-for d in range(1,4):
+for d in range(2,3):
     x = beta_grid**(1/(d+1))
     a1, b1, r1 = tensor_linregress(x,logGd[:,:,dmu_ind1,:])
     a2, b2, r2 = tensor_linregress(x,logGd[:,:,dmu_ind2,:])
@@ -131,3 +134,7 @@ for d in range(1,4):
     plt.suptitle('Quality of exponential fit of $G_{nd}$ vs. $\\beta^{1/%d}$ assuming $\kappa = %f$ eV.\nShowing only fits with $r^2 > %f$.'%(d+1, kappa_grid[kappa_ind2],rtol))
     plt.colorbar()
     plt.show()
+
+    print('\n*** %dD ***'%d)
+    for r in [r1,r2,r3,r4]:
+        print(np.sum(r**2 > rtol))
