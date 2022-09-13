@@ -53,10 +53,11 @@ if __name__ == '__main__':
 
     kB = 8.617e-5 # eV/K
 
-    datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
+    #datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
+    datadir = '.'
 
-    LUMO_file = path.join(datadir,'LUMO_energy_Gammas_80000-81000-2.npy')
-    LUMOp1_file = path.join(datadir,'LUMO+1_energy_Gammas_80000-81000-2.npy')
+    LUMO_file = path.join(datadir,'LUMO_energy_yGammas_80000-81000-2.npy')
+    LUMOp1_file = path.join(datadir,'LUMO+1_energy_yGammas_80000-81000-2.npy')
 
     LUMO_data = np.load(LUMO_file)
     LUMOp1_data = np.load(LUMOp1_file)
