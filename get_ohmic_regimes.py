@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
         *_, rvals = tensor_linregress(dmu_grid[:dmu_ind],I[:,:,:,:dmu_ind])
         ohm_bools = (rvals >= 0.99)
-        print(np.sum(ohm_bools))
+        print('Number of ohmic realisations for dmu <= %5.3f = '%dmu_grid[dmu_ind-1], np.sum(ohm_bools))
 
         all_ohmic = np.all(ohm_bools)
         dmu_ind += 1
