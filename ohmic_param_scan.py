@@ -71,9 +71,9 @@ if __name__ == '__main__':
     gamR = np.mean(LUMOp1_data[3,:]) #avg coupling of LUMO+1 to bottom edge of MAC structure #0.2 #eV
     gam_phonon = 0.1
 
-    kappa_grid = np.linspace(0.01,0.1,21)
+    kappa_grid = np.linspace(0.001,0.1,21)
 
-    w0_grid = np.linspace(0.01,1.0,31)
+    w0_grid = np.linspace(0.001,0.1,21)
 
     muL = 0.04
     temp_grid = np.linspace(40,400,400)
