@@ -73,7 +73,7 @@ if __name__ == '__main__':
 
     kappa_grid = np.linspace(0.001,0.1,21)
 
-    w0_grid = np.linspace(0.001,0.1,21)
+    w0_grid = np.linspace(0.001,0.1,41)
 
     muL = 0.04
     temp_grid = np.linspace(40,400,400)

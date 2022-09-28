@@ -36,7 +36,7 @@ temp_grid = np.linspace(40,400,400)
 beta_grid = 1.0 / (kB * temp_grid)
 dmu = 0.08
 kappa_grid = np.linspace(0.001,0.1,21)
-w0_grid = np.linspace(0.001,0.1,21)
+w0_grid = np.linspace(0.001,0.1,41)
 
 
 Id = np.load('MAC_current_dis_dmu0.08.npy')
@@ -55,7 +55,7 @@ rtol = 0.95
 
 for d in [1]:
     x = beta_grid**(1/(d+1))
-    a1, b1, r1 = tensor_linregress(x,logGd[:,:,:])
+    a1, b1, r1 = tensor_linregress(x,logGd)
 
     plt.imshow((r1**2).T,origin='lower',extent=[*w0_grid[[0,-1]], *kappa_grid[[0,-1]]])
     plt.xlabel('$\omega_0$ [eV]')
@@ -71,4 +71,4 @@ for d in [1]:
     plt.colorbar()
     plt.show()
 
-    
+print(np.all(r1 == r1[0],axis=0).shape)

@@ -43,7 +43,7 @@ Ind = np.load('MAC_current_non-dis.npy')
 Gnd = Ind / dmu[None,None,:,None]
 
 #Id = np.load('40-4000K/full_current_dis.npy')
-Id = np.load('MAC_current_dis.npy')
+Id = np.load('MAC_current_dis_dmu0.08.npy')
 Gd = Id / dmu[None,None,:,None]
 
 print(np.all(Id == Ind))
