@@ -36,7 +36,7 @@ temp_grid = np.linspace(40,400,400)
 beta_grid = 1.0 / (kB * temp_grid)
 dmu = 0.08
 kappa_grid = np.linspace(0.001,0.1,21)
-w0_grid = np.linspace(0.001,0.1,21)
+w0_grid = np.linspace(0.001,0.1,41)
 
 Id = np.load('MAC_current_dis_dmu0.08.npy')
 Gd = Id / dmu
@@ -69,3 +69,6 @@ plt.suptitle('Quality of power law fit of $G_{nd}$ vs. $\\beta$ assuming $\Delta
 plt.colorbar()
 plt.show()
 
+print(np.max(np.abs(r1 - r1[:,0][:,None])))
+
+np.save('fit_params_rch.npy',np.vstack((a1[:,0],b1[:,0],r1[:,0])))

@@ -71,4 +71,11 @@ for d in [1]:
     plt.colorbar()
     plt.show()
 
-print(np.all(r1 == r1[0],axis=0).shape)
+print(np.max(np.abs(r1 - r1[:,0][:,None])))
+
+plt.plot(w0_grid, a1, 'r-', lw=0.8)
+plt.xlabel('$\omega_0$ [eV]')
+plt.ylabel('Slope of linear fit')
+plt.show()
+
+np.save('fit_params_mott.npy',np.vstack((a1[:,0],b1[:,0],r1[:,0])))
