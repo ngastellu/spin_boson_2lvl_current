@@ -20,11 +20,14 @@ plt.legend()
 plt.show()
 
 #Plot values of the linear fit slopes
-plt.plot(w0_grid,mott_params[0,:]**2,lw=0.8,label='Mott')
-plt.plot(w0_grid,rch_params[0,:]**2,lw=0.8,label='RCH')
+plt.plot(w0_grid,mott_params[0,:],lw=0.8,label='Mott')
+plt.plot(w0_grid,rch_params[0,:],lw=0.8,label='RCH')
 plt.xlabel('$\omega_0$ [eV]')
-plt.ylabel('$Slope of linear fit$')
+plt.ylabel('Slope of linear fit')
 plt.legend()
 plt.show()
 
-
+plt.semilogy(w0_grid,rch_params[0,:],lw=0.8)
+plt.xlabel('$\omega_0$ [eV]')
+plt.ylabel('Slope of linear fit')
+plt.show()

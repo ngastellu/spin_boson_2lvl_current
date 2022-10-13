@@ -52,7 +52,7 @@ kappa_ind1 = 0
 kappa_ind2 = -1
 rtol = 0.95
 
-x = np.log(beta_grid)
+x = np.log(temp_grid)
 a1, b1, r1 = tensor_linregress(x,logGd[:,:,:])
 
 plt.imshow((r1**2).T,origin='lower',extent=[*w0_grid[[0,-1]], *kappa_grid[[0,-1]]])

@@ -73,7 +73,8 @@ if __name__ == '__main__':
 
     kappa_grid = np.linspace(0.001,0.1,21)
 
-    w0_grid = np.linspace(0.001,0.1,41)
+    #Old range ---> np.linspace(0.001,0.1,41)
+    w0_grid = np.linspace(0.1,0.3,79)
 
     muL = 0.04
     temp_grid = np.linspace(40,400,400)
@@ -110,10 +111,10 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    np.save('MAC_kLR01_dmu0.08.npy',k_LR_01)
-    np.save('MAC_kLR10_dmu0.08.npy',k_LR_10)
-    np.save('MAC_kRL01_dmu0.08.npy',k_RL_01)
-    np.save('MAC_kRL10_dmu0.08.npy',k_RL_10)
+    np.save('MAC_kLR01_dmu0.08_hi-w0.npy',k_LR_01)
+    np.save('MAC_kLR10_dmu0.08_hi-w0.npy',k_LR_10)
+    np.save('MAC_kRL01_dmu0.08_hi-w0.npy',k_RL_01)
+    np.save('MAC_kRL10_dmu0.08_hi-w0.npy',k_RL_10)
 
     k_01 = k_LR_01 + k_RL_01
     k_10 = k_LR_10 + k_RL_10
@@ -124,7 +125,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
-    np.save('MAC_current_non-dis_dmu0.08.npy', current)
+    np.save('MAC_current_non-dis_dmu0.08_hi-w0.npy', current)
 
     plt.plot(temp_grid,current[0,-1,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,:],'r-',lw=0.8)
@@ -142,7 +143,7 @@ if __name__ == '__main__':
     p0 = 1 - p1
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
-    np.save('MAC_current_dis_dmu0.08.npy', current)
+    np.save('MAC_current_dis_dmu0.08_hi-w0.npy', current)
 
     plt.plot(temp_grid,current[0,-1,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,:],'r-',lw=0.8)
