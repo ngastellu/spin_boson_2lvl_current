@@ -1,0 +1,19 @@
+{
+    "intrinsic" : {
+        "e_donor" : 0.04,
+        "e_acceptor" : 0.06,
+        "gamma_phonon" : 0.1
+    },
+
+    "grids": {
+        "muL_grid" : [ 0.01,1,51 ],
+        "kappa_grid" : [ 0.01,0.1,11 ],
+        "temperature_grid" : [ 40,400,400 ],
+        "energy_grid" : [ -5,5,4000 ]
+    },
+
+    "specific" : {
+        "ohmic_muL" : 0.08,
+        "cursed_frequency" : 0.02
+    }
+} 

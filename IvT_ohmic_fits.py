@@ -33,7 +33,7 @@ if __name__ == '__main__':
     temp_grid = np.linspace(40,400,400)
 
     dmu = 0.08
-    I1 = np.load('MAC_current_dis_dmu0.08.npy')
+    I1 = np.load('MAC_current_dis_dmu0.08_aligned.npy')
     I2 = np.load('MAC_current_dis_dmu0.08_hi-w0.npy')
     print(I1.shape)
     print(I2.shape)

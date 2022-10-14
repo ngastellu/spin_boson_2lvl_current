@@ -40,7 +40,7 @@ if __name__ == '__main__':
     kappa_grid = np.linspace(0.01,0.1,11)
     w0_grid = np.linspace(0.01,1.0,21)
 
-    I = np.moveaxis(np.load('MAC_current_dis.npy'),2,-1) #move dmu axis to last position to use tensor_linregress painlessly
+    I = np.moveaxis(np.load('MAC_current_dis_dmu0.08_aligned.npy'),2,-1) #move dmu axis to last position to use tensor_linregress painlessly
     # axes of I are now: (w0, kappa, beta, dmu)
 
     *_, rvals = tensor_linregress(dmu_grid, I)

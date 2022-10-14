@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import simpson
 from time import perf_counter
 from os import path
+from param_parser import ParameterParser
 
 
 def lor(e,gamma,e0):
@@ -56,32 +57,18 @@ if __name__ == '__main__':
     #datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
     datadir = '.'
 
-    LUMO_file = path.join(datadir,'LUMO_energy_yGammas_80000-81000-2.npy')
-    LUMOp1_file = path.join(datadir,'LUMO+1_energy_yGammas_80000-81000-2.npy')
+    param_file = 'original_parameters.json'
 
-    LUMO_data = np.load(LUMO_file)
-    LUMOp1_data = np.load(LUMOp1_file)
+    pp = ParameterParser(param_file)
 
-    
+    e_d, e_a, gam_phonon = pp.load_intrinsic()
 
-    e_d = np.mean(LUMO_data[1,:]) #-0.2 # LUMO energy [eV]
-    e_a = np.mean(LUMOp1_data[1,:]) #0.4 # LUMO+1 energy [eV]
-
-    gamL = np.mean(LUMO_data[2,:]) #avg coupling of LUMO to top edge of MAC structure #0.2 #eV
-    gamR = np.mean(LUMOp1_data[3,:]) #avg coupling of LUMO+1 to bottom edge of MAC structure #0.2 #eV
-    gam_phonon = 0.1
-
-    kappa_grid = np.linspace(0.01,0.1,11)
-    #kappa_grid = np.ones(2) * 0.1
-    w0_grid = np.linspace(0.01,1.0,21)
-    #w0_grid = np.ones(3) * 0.05
-
-    muL_grid = np.linspace(-0.5,1,51) #muR = -muL always
-    #muL_grid = np.ones(4)*0.4
-    temp_grid = np.linspace(40,400,200)
+    kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
+        pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
+            'temperature_grid', 'energy_grid'])
 
     beta_grid = 1.0 / (kB * temp_grid)
-    e_grid = np.linspace(-5,5,20000)
+   
 
     mm, bb, ee = np.meshgrid(muL_grid,beta_grid,e_grid,indexing='ij',sparse=True)
 
@@ -96,13 +83,7 @@ if __name__ == '__main__':
     for j, ww in enumerate(w0_grid):
         print('\n')
         print(j)
-
-        #k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+2*mm,e_a-2*mm,bb,kappa_grid,-ww)
-        #k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-2*mm,e_d+2*mm,bb,kappa_grid,-ww)
-
-        #k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+2*mm,e_a-2*mm,bb,kappa_grid,ww)
-        #k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-2*mm,e_d+2*mm,bb,kappa_grid,ww)
-
+        
         k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,-ww)
         k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,-ww)
 
