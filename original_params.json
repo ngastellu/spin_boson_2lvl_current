@@ -1,16 +1,18 @@
 {
     "intrinsic" : {
-        "e_donor" : -9.60629862775973,
-        "e_acceptor" : -9.591389713524997,
-        "gamma_phonon" : 0.1
+        "path_to_data" : "~/Desktop/simulation_outputs/MO_dynamics/300K_og", 
+        "LUMO_data_file" : "LUMO_energy_yGammas_80000-81000-2.npy",
+        "LUMO+1_data_file" : "LUMO+1_energy_yGammas_80000-81000-2.npy",
+        "gamma_phonon" : 0.1,
+        "e_shift" : 0
     },
 
     "grids": {
-        "muL_grid" : [ 0.01,1,51 ],
+        "muL_grid" : [ -0.5,1,51 ],
         "kappa_grid" : [ 0.01,0.1,11 ],
-        "temperature_grid" : [ 40,400,400 ],
+        "temperature_grid" : [ 40,400,200 ],
         "energy_grid" : [ -5,5,4000 ],
-        "frequency_grid" : [ 0.01,1.0,41 ]
+        "frequency_grid" : [ 0.01,1.0,21 ]
     },
 
     "specific" : {

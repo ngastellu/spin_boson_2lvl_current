@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import simpson
 from time import perf_counter
-from os import path
+from os import path, mkdir
 from param_parser import ParameterParser
 
 
@@ -50,18 +50,20 @@ def transfer_rate(e,mu,gamma_i,gamma_f,e_i,e_f,beta,kappa,w):
 # ****** MAIN ******
 if __name__ == '__main__':
 
-    # Define static params
-
+   
     kB = 8.617e-5 # eV/K
 
-    #datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
-    datadir = '.'
+    outdir = 'MAC_aligned'
 
-    param_file = 'original_parameters.json'
+    if not path.isdir(outdir):
+        mkdir(outdir)
+
+
+    param_file = 'aligned_params.json'
 
     pp = ParameterParser(param_file)
 
-    e_d, e_a, gam_phonon = pp.load_intrinsic()
+    e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
 
     kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
         pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
@@ -99,10 +101,10 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    np.save('MAC_kLR01.npy',k_LR_01)
-    np.save('MAC_kLR10.npy',k_LR_10)
-    np.save('MAC_kRL01.npy',k_RL_01)
-    np.save('MAC_kRL10.npy',k_RL_10)
+    np.save(path.join(outdir,'kLR01.npy'),k_LR_01)
+    np.save(path.join(outdir,'kLR10.npy'),k_LR_10)
+    np.save(path.join(outdir,'kRL01.npy'),k_RL_01)
+    np.save(path.join(outdir,'kRL10.npy'),k_RL_10)
 
     k_01 = k_LR_01 + k_RL_01
     k_10 = k_LR_10 + k_RL_10
@@ -113,7 +115,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
-    np.save('MAC_current_non-dis.npy', current)
+    np.save(path,join(outdir,'current_non-dis.npy'), current)
 
     plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)
@@ -131,7 +133,7 @@ if __name__ == '__main__':
     p0 = 1 - p1
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
-    np.save('MAC_current_dis.npy', current)
+    np.save(path.join(outdir, 'current_dis.npy'), current)
 
     plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)
