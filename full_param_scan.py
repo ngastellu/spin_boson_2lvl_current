@@ -53,17 +53,20 @@ if __name__ == '__main__':
    
     kB = 8.617e-5 # eV/K
 
-    outdir = 'MAC_aligned'
+    outdir = 'MAC_aligned_focused_egrid'
 
     if not path.isdir(outdir):
         mkdir(outdir)
 
 
-    param_file = 'aligned_params.json'
+    param_file = 'aligned_focused_egrid.json'
 
     pp = ParameterParser(param_file)
 
     e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
+
+    print(e_d)
+    print(e_a)
 
     kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
         pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
@@ -115,7 +118,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
-    np.save(path,join(outdir,'current_non-dis.npy'), current)
+    np.save(path.join(outdir,'current_non-dis.npy'), current)
 
     plt.plot(temp_grid,current[0,-1,0,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,0,:],'r-',lw=0.8)

@@ -27,8 +27,8 @@ class ParameterParser:
         gam_ph = idict['gamma_phonon']
         shift = idict['e_shift']
 
-        e_d -= shift
-        e_a -= shift
+        e_d += shift
+        e_a += shift
 
         return e_d, e_a, gamL, gamR, gam_ph
 
