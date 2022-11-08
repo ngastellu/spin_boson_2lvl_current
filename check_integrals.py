@@ -51,7 +51,7 @@ plt.show()
 print(integral.argmax())
 
 plt.plot(e_grid,lorL*lor(e_grid-w0_grid[integral.argmax()],gamR,e_d),'r-',label='$J_(\epsilon)\cdot J_R(\epsilon-\omega_0)$')
-plt.plot(e_grid,lorL*lorR,'r--',label='$J_(\epsilon)\cdot J_R(\epsilon)$',lw=0.8)
+plt.plot(e_grid,lorL*lorR,'b--',label='$J_(\epsilon)\cdot J_R(\epsilon)$',lw=0.8)
 plt.axvline(x=e_d,c='k',ls='--',lw=0.6)
 plt.axvline(x=e_a-w0_grid[integral.argmax()],c='k',ls='--',lw=0.6)
 plt.axvline(x=e_d,c='tab:gray',ls='--',lw=0.6)

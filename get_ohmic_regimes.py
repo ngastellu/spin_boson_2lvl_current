@@ -3,6 +3,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+from param_parser import ParameterParser
 import plt_utils
 
 def tensor_linregress(x,y,yaxis=-1):
@@ -34,16 +35,33 @@ if __name__ == '__main__':
 
     kB = 8.617e-5
     #temp_grid = np.linspace(40,4000,200)
-    temp_grid = np.linspace(40,400,200)
-    beta_grid = 1.0 / (kB * temp_grid)
-    dmu_grid = 2.0*np.linspace(-0.5,1,51)
-    kappa_grid = np.linspace(0.01,0.1,11)
-    w0_grid = np.linspace(0.01,1.0,21)
 
-    I = np.moveaxis(np.load('MAC_current_dis_dmu0.08_aligned.npy'),2,-1) #move dmu axis to last position to use tensor_linregress painlessly
+    #npydir = 'MAC_full_misaligned'
+    #param_file = 'original_params.json'
+
+    npydir = 'MAC_aligned_focused_small_dmu'
+    param_file = 'aligned_focused_small_dmu.json'
+
+    pp = ParameterParser(param_file)
+
+    kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
+    pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
+        'temperature_grid', 'energy_grid'])
+
+    dmu_grid = muL_grid * 2
+
+    I = np.moveaxis(np.load('%s/current_dis.npy'%npydir),2,-1) #move dmu axis to last position to use tensor_linregress painlessly
     # axes of I are now: (w0, kappa, beta, dmu)
 
     *_, rvals = tensor_linregress(dmu_grid, I)
+    print(np.max(rvals**2))
+
+    most_ohmic_inds = np.unravel_index((rvals**2).argmax(),rvals.shape)
+    print(most_ohmic_inds)
+
+    plt.plot(dmu_grid,I[most_ohmic_inds],'r-',lw=0.8)
+    plt.show()
+    print(dmu_grid)
 
     # ohm_bools will be True where I ~ V for all values of V for specific values of (w0,kappa,beta)
     ohm_bools = (rvals**2 > 0.985)
@@ -56,6 +74,9 @@ if __name__ == '__main__':
     plt.xlabel('$\omega_0$ [eV]')
     plt.ylabel('$\kappa$ [eV]')
     plt.show()
+
+
+    # ******** IMPORTANT PART STARTS HERE ********
 
     # Now we do this for real; for which values of V do we have an ohmic regime for all values of all other parameters?
     # We focus only on postive bias (ie V > 0).
@@ -70,7 +91,11 @@ if __name__ == '__main__':
     while all_ohmic and (dmu_ind < dmu_grid.size):
 
         *_, rvals = tensor_linregress(dmu_grid[:dmu_ind],I[:,:,:,:dmu_ind])
-        ohm_bools = (rvals >= 0.99)
+        ohm_bools = (rvals**2 >= 0.99)
+        print(np.min(rvals))
+        minds = np.unravel_index(np.argmin(rvals), rvals.shape)
+        print(minds)
+        print([w0_grid[minds[0]]])
         print('Number of ohmic realisations for dmu <= %5.3f = '%dmu_grid[dmu_ind-1], np.sum(ohm_bools))
 
         all_ohmic = np.all(ohm_bools)

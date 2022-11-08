@@ -53,13 +53,13 @@ if __name__ == '__main__':
    
     kB = 8.617e-5 # eV/K
 
-    outdir = 'MAC_aligned_focused_egrid'
+    outdir = 'MAC_aligned_focused_small_dmu'
 
     if not path.isdir(outdir):
         mkdir(outdir)
 
 
-    param_file = 'aligned_focused_egrid.json'
+    param_file = 'aligned_focused_small_dmu.json'
 
     pp = ParameterParser(param_file)
 
