@@ -53,13 +53,13 @@ if __name__ == '__main__':
    
     kB = 8.617e-5 # eV/K
 
-    outdir = 'MAC_aligned_focused_small_dmu'
+    outdir = 'MAC_aligned_focused_smaller_dmu_no_shift'
 
     if not path.isdir(outdir):
         mkdir(outdir)
 
 
-    param_file = 'aligned_focused_small_dmu.json'
+    param_file = 'aligned_focused_smaller_dmu.json'
 
     pp = ParameterParser(param_file)
 
@@ -89,11 +89,17 @@ if __name__ == '__main__':
         print('\n')
         print(j)
         
-        k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,-ww)
-        k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,-ww)
+        #k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,-ww)
+        #k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,-ww)
 
-        k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,ww)
-        k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,ww)
+        #k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d+1*mm,e_a-1*mm,bb,kappa_grid,ww)
+        #k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a-1*mm,e_d+1*mm,bb,kappa_grid,ww)
+
+        k_LR_01[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d,e_a,bb,kappa_grid,-ww)
+        k_RL_01[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a,e_d,bb,kappa_grid,-ww)
+
+        k_LR_10[j,:,:,:] = transfer_rate(ee,mm,gamL,gamR,e_d,e_a,bb,kappa_grid,ww)
+        k_RL_10[j,:,:,:] = transfer_rate(ee,-mm,gamR,gamL,e_a,e_d,bb,kappa_grid,ww)
 
     plt.plot(temp_grid,k_RL_01[0,0,-1,:],'b-',lw=0.8,label='RL 01')
     plt.plot(temp_grid,k_LR_01[0,0,-1,:],'r-',lw=0.8,label='LR 01')

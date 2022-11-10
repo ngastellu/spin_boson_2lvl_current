@@ -54,7 +54,7 @@ def tensor_linregress(x,y,yaxis=-1):
 plt_utils.setup_tex()
 
 x = np.linspace(-1,1,200)
-func_params = [2,4,3]
+func_params = [2,4,0]
 
 y = gen_data(x,cool_f, func_params, 0.1, num_outliers = 10)
 
@@ -92,8 +92,8 @@ y = gen_data(xx,cool_f,[aa,bb,cc])
 logy = np.log(y)
 print(logy.shape)
 
-for k, cval in enumerate(b_grid):
-    plt.plot(x, logy[0,k,0,:],ls='-',c=clrs[k],label=str(cval))
+for k, bval in enumerate(b_grid):
+    plt.plot(x, logy[0,k,0,:],ls='-',c=clrs[k],label=str(bval))
 plt.legend()
 plt.show()
 
@@ -103,10 +103,27 @@ print('r^2 of linear regression = ', rval**2)
 
 for k, bval in enumerate(b_grid):
     plt.plot(x, logy[0,k,0,:],'o',c=clrs[k],label=str(cval),ms=2.0)
-    plt.plot(x, a_lfit[0,k,0]*x + b_lfit[0,k,0], ls='-',c=clrs[k],label=str(cval))
+    plt.plot(x, a_lfit[0,k,0]*x + b_lfit[0,k,0], ls='-',c=clrs[k],label=str(bval))
 plt.legend()
 plt.show()
 
 plt.imshow(rval[0,:,:]**2,origin='lower')
 plt.colorbar()
 plt.show()
+
+
+
+
+# **** CONSTANT FIT ****
+print('**** Constant fit ****')
+
+y0 = 1
+yconst = gen_data(x, lambda x: y0, [],y0/10000,0)
+plt.plot(x,yconst,'ro',ms=2.0)
+plt.plot(x,np.ones(x.shape[0])*y0,'b-',lw=0.8)
+plt.show()
+
+a, b, r = tensor_linregress(x,yconst)
+print('Fit slope = ', a)
+print('Fit intercept = ', b)
+print('Quality of fit r = ', r)

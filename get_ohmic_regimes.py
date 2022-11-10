@@ -39,8 +39,8 @@ if __name__ == '__main__':
     #npydir = 'MAC_full_misaligned'
     #param_file = 'original_params.json'
 
-    npydir = 'MAC_aligned_focused_small_dmu'
-    param_file = 'aligned_focused_small_dmu.json'
+    npydir = 'MAC_aligned_focused_smaller_dmu_no_shift'
+    param_file = 'aligned_focused_smaller_dmu.json'
 
     pp = ParameterParser(param_file)
 
@@ -49,23 +49,33 @@ if __name__ == '__main__':
         'temperature_grid', 'energy_grid'])
 
     dmu_grid = muL_grid * 2
+    print(dmu_grid[0])
 
     I = np.moveaxis(np.load('%s/current_dis.npy'%npydir),2,-1) #move dmu axis to last position to use tensor_linregress painlessly
     # axes of I are now: (w0, kappa, beta, dmu)
+    print(I.shape)
+
+    print(np.min(I[:,:,:,0]))
+    print(np.max(I[:,:,:,0]))
+
+    I_zero_bias = I[:,:,:,0]
+    plt_utils.histogram(I_zero_bias,nbins=200,xlabel='$I(\Delta\mu = 0)$')
+    print('Mean 0 bias current = ', np.mean(I_zero_bias))
+
 
     *_, rvals = tensor_linregress(dmu_grid, I)
     print(np.max(rvals**2))
 
     most_ohmic_inds = np.unravel_index((rvals**2).argmax(),rvals.shape)
-    print(most_ohmic_inds)
+    #print(most_ohmic_inds)
 
     plt.plot(dmu_grid,I[most_ohmic_inds],'r-',lw=0.8)
     plt.show()
-    print(dmu_grid)
+    #print(dmu_grid)
 
     # ohm_bools will be True where I ~ V for all values of V for specific values of (w0,kappa,beta)
     ohm_bools = (rvals**2 > 0.985)
-    print('Ohmic for all V for %d of %d possible parameter combinations.'%(np.sum(ohm_bools), ohm_bools.size))
+    #print('Ohmic for all V for %d of %d possible parameter combinations.'%(np.sum(ohm_bools), ohm_bools.size))
 
     # Obtain (w0, kappa) values for which ohmic regime is maintained at all temperatures
     ohm_bools_allT = np.all(ohm_bools, axis=2)
@@ -91,7 +101,7 @@ if __name__ == '__main__':
     while all_ohmic and (dmu_ind < dmu_grid.size):
 
         *_, rvals = tensor_linregress(dmu_grid[:dmu_ind],I[:,:,:,:dmu_ind])
-        ohm_bools = (rvals**2 >= 0.99)
+        ohm_bools = (rvals**2 >= 0.98)
         print(np.min(rvals))
         minds = np.unravel_index(np.argmin(rvals), rvals.shape)
         print(minds)
@@ -104,4 +114,4 @@ if __name__ == '__main__':
     print(dmu_ind)
     print('Max dmu value = ', dmu_grid[dmu_ind-2])
 
-    print(dmu_grid[:3])
+    print(dmu_grid[:dmu_ind-1])
