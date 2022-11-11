@@ -3,27 +3,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
+from tensor_linregress import tensor_linregress
 from param_parser import ParameterParser
 import plt_utils
-
-def tensor_linregress(x,y,yaxis=-1):
-    xavg = np.mean(x)
-    yavg = np.mean(y,axis=yaxis)
-    vary = np.var(y,axis=yaxis)
-
-    if yaxis == -1:
-        xy_avg = np.mean(x*y,axis=-1)
-        varx = np.var(x)
-        #xshape = eval('(' +','.join(['None'*y.ndim-1]) + ',' + str(x.shape[0]) ')') 
-        cov_xy = xy_avg - xavg*yavg
-        slope = cov_xy / varx
-        intercept = yavg - slope* xavg
-        r = cov_xy / np.sqrt(varx * vary)
-        return slope, intercept, r
-
-    else:
-        print('[tensor_linregress] ERROR: yaxis != -1 not yet implemented! Returning 0.')
-        return 0
 
 
 # ************* MAIN *************
@@ -59,8 +41,10 @@ if __name__ == '__main__':
     print(np.max(I[:,:,:,0]))
 
     I_zero_bias = I[:,:,:,0]
-    plt_utils.histogram(I_zero_bias,nbins=200,xlabel='$I(\Delta\mu = 0)$')
+    plt_utils.histogram(I_zero_bias, nbins=200,xlabel='$I(\Delta\mu = 0)$')
     print('Mean 0 bias current = ', np.mean(I_zero_bias))
+
+    
 
 
     *_, rvals = tensor_linregress(dmu_grid, I)
@@ -69,8 +53,46 @@ if __name__ == '__main__':
     most_ohmic_inds = np.unravel_index((rvals**2).argmax(),rvals.shape)
     #print(most_ohmic_inds)
 
+    plt.imshow(I_zero_bias[0].T,origin='lower')
+    plt.suptitle('Zero bias current for $\omega_0 = %5.3f\,$eV'%w0_grid[0])
+    plt.xlabel('$\kappa$ indices')
+    plt.ylabel('$T$ indices')
+    plt.colorbar()
+    plt.show()
+
+    plt.imshow(I_zero_bias[:,-1,:].T,origin='lower')
+    plt.suptitle('Zero bias current for $\kappa = %4.2f\,$eV'%kappa_grid[-1])
+    plt.xlabel('$\omega_0$ indices')
+    plt.ylabel('$T$ indices')
+    plt.colorbar()
+    plt.show()
+
+    plt.imshow(I_zero_bias[:,:,-1].T,origin='lower')
+    plt.suptitle('Zero bias current for $T = %5.1f\,$K'%temp_grid[-1])
+    plt.ylabel('$\kappa$ indices')
+    plt.xlabel('$\omega_0$ indices')
+    plt.colorbar()
+    plt.show()
+
+    plt.imshow(I_zero_bias[:,:,0].T,origin='lower')
+    plt.suptitle('Zero bias current for $T = %5.1f\,$K'%temp_grid[0])
+    plt.ylabel('$\kappa$ indices')
+    plt.xlabel('$\omega_0$ indices')
+    plt.colorbar()
+    plt.show()
+
+    I_finite_dmu = I[:,:,:,1:]
+    plt_utils.histogram(I_finite_dmu,nbins=200,xlabel='Current',show=False,normalised=True,\
+        plt_kwargs={'alpha':0.6, 'color': 'b','label':'$\Delta\mu > 0\,$eV'})
+    plt_utils.histogram(I_zero_bias,nbins=200,xlabel='Current',show=False,normalised=True,\
+        plt_kwargs={'alpha':0.6, 'color': 'r','label':'$\Delta\mu = 0\,$eV'})
+    plt.legend()
+    plt.show()
+
+
     plt.plot(dmu_grid,I[most_ohmic_inds],'r-',lw=0.8)
     plt.show()
+
     #print(dmu_grid)
 
     # ohm_bools will be True where I ~ V for all values of V for specific values of (w0,kappa,beta)
@@ -99,13 +121,15 @@ if __name__ == '__main__':
     dmu_ind = 2
 
     while all_ohmic and (dmu_ind < dmu_grid.size):
-
+        print('\n')
         *_, rvals = tensor_linregress(dmu_grid[:dmu_ind],I[:,:,:,:dmu_ind])
-        ohm_bools = (rvals**2 >= 0.98)
-        print(np.min(rvals))
+        ohm_bools = (rvals**2 >= 0.99)
+        print('Worst linear fit rval = ', np.min(rvals))
         minds = np.unravel_index(np.argmin(rvals), rvals.shape)
-        print(minds)
-        print([w0_grid[minds[0]]])
+        print('Worst fit inds: ', minds)
+        maxinds = np.unravel_index(np.argmax(rvals), rvals.shape)
+        print('Best linear fit rval = ', np.max(rvals))
+        print('Best fit inds: ', maxinds)
         print('Number of ohmic realisations for dmu <= %5.3f = '%dmu_grid[dmu_ind-1], np.sum(ohm_bools))
 
         all_ohmic = np.all(ohm_bools)
@@ -115,3 +139,12 @@ if __name__ == '__main__':
     print('Max dmu value = ', dmu_grid[dmu_ind-2])
 
     print(dmu_grid[:dmu_ind-1])
+
+# ************************************** #
+# Now, we conduct a different test for the ohmic regime.
+# Going off of the assumption that the 0-bias voltage is null, the conductance is simply:
+# I()
+
+G_values = I_finite_dmu/dmu[1:]
+deviations = 
+
