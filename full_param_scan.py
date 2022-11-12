@@ -53,13 +53,13 @@ if __name__ == '__main__':
    
     kB = 8.617e-5 # eV/K
 
-    outdir = 'MAC_aligned_focused_smaller_dmu_no_shift'
+    outdir = 'MAC_aligned_focused_max_dmu0.1_no_shift'
 
     if not path.isdir(outdir):
         mkdir(outdir)
 
 
-    param_file = 'aligned_focused_smaller_dmu.json'
+    param_file = 'aligned_focused_max_dmu_dmu0.1.json'
 
     pp = ParameterParser(param_file)
 
