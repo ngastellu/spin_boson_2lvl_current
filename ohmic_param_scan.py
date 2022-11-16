@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import simpson
 from time import perf_counter
 from os import path
+from param_parser import ParameterParser
 
 
 def lor(e,gamma,e0):
@@ -49,53 +50,22 @@ def transfer_rate(e,mu,gamma_i,gamma_f,e_i,e_f,beta,kappa,w):
 # ****** MAIN ******
 if __name__ == '__main__':
 
-    # Define static params
-
     kB = 8.617e-5 # eV/K
 
-    datadir = path.expanduser('~/Desktop/simulation_outputs/MO_dynamics/300K_og')
-    #datadir = '.'
+    outdir = 'ohmic_dmu0.05_aligned_focused'
 
-    HOMO_file = path.join(datadir,'HOMO_energy_Gammas_80000-81000-2.npy')
-    LUMO_file = path.join(datadir,'LUMO_energy_yGammas_80000-81000-2.npy')
-    LUMOp1_file = path.join(datadir,'LUMO+1_energy_yGammas_80000-81000-2.npy')
+    param_file = 'aligned_focused_max_dmu0.02_fine_grids.json'
+    pp = ParameterParser(param_file)
 
-    HOMO_data = np.load(HOMO_file)
-    LUMO_data = np.load(LUMO_file)
-    LUMOp1_data = np.load(LUMOp1_file)
-
+    e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
     
-
+    kappa_grid, w0_grid, temp_grid, e_grid = \
+        pp.load_grids(plist=['kappa_grid', 'frequency_grid',
+            'temperature_grid', 'energy_grid'])
     
-    #e_d = np.mean(LUMO_data[1,:]) #-0.2 # LUMO energy [eV]
-    #e_a = np.mean(LUMOp1_data[1,:]) #0.4 # LUMO+1 energy [eV]
+    muL = pp.load_specific(['ohmic_dmu'])[0] / 2
 
-    e_d = 0.04
-    e_a = 0.06
-
-    bandgap = np.mean(LUMO_data[1,:]) - np.mean(HOMO_data[1,:])
-    eF = (np.mean(LUMO_data[1,:]) + np.mean(HOMO_data[1,:]))/2
-
-    print(eF)
-    #print(bandgap)
-
-    print(e_d)
-    print(e_a)
-
-    gamL = np.mean(LUMO_data[2,:]) #avg coupling of LUMO to top edge of MAC structure #0.2 #eV
-    gamR = np.mean(LUMOp1_data[3,:]) #avg coupling of LUMO+1 to bottom edge of MAC structure #0.2 #eV
-    gam_phonon = 0.1
-
-    kappa_grid = np.linspace(0.001,0.1,21)
-
-    #Old range ---> np.linspace(0.001,0.1,41)
-    w0_grid = np.linspace(0.001,0.1,41)
-
-    muL = 0.04
-    temp_grid = np.linspace(40,400,400)
-
-    beta_grid = 1.0 / (kB * temp_grid)
-    e_grid = np.linspace(-5,5,20000)
+    beta_grid = 1.0/(kB * temp_grid)
 
     bb, ee = np.meshgrid(beta_grid,e_grid,indexing='ij',sparse=True)
 
@@ -106,16 +76,26 @@ if __name__ == '__main__':
     k_LR_10 = np.zeros(output_shape)
     k_RL_10 = np.zeros(output_shape)
 
+    shift_lvls = False
+
 
     for j, ww in enumerate(w0_grid):
-        #print('\n')
-        #print(j)
+        print('\n')
+        print(j)
 
-        k_LR_01[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d+1*muL,e_a-1*muL,bb,kappa_grid,-ww)
-        k_RL_01[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a-1*muL,e_d+1*muL,bb,kappa_grid,-ww)
+        if shift_lvls:
+            k_LR_01[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d+1*muL,e_a-1*muL,bb,kappa_grid,-ww)
+            k_RL_01[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a-1*muL,e_d+1*muL,bb,kappa_grid,-ww)
 
-        k_LR_10[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d+1*muL,e_a-1*muL,bb,kappa_grid,ww)
-        k_RL_10[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a-1*muL,e_d+1*muL,bb,kappa_grid,ww)
+            k_LR_10[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d+1*muL,e_a-1*muL,bb,kappa_grid,ww)
+            k_RL_10[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a-1*muL,e_d+1*muL,bb,kappa_grid,ww)
+
+        else:
+            k_LR_01[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d,e_a,bb,kappa_grid,-ww)
+            k_RL_01[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a,e_d,bb,kappa_grid,-ww)
+
+            k_LR_10[j,:,:] = transfer_rate(ee,muL,gamL,gamR,e_d,e_a,bb,kappa_grid,ww)
+            k_RL_10[j,:,:] = transfer_rate(ee,-muL,gamR,gamL,e_a,e_d,bb,kappa_grid,ww)
 
     plt.plot(temp_grid,k_RL_01[0,0,:],'b-',lw=0.8,label='RL 01')
     plt.plot(temp_grid,k_LR_01[0,0,:],'r-',lw=0.8,label='LR 01')
@@ -126,10 +106,10 @@ if __name__ == '__main__':
     plt.legend()
     plt.show()
 
-    np.save('MAC_kLR01_dmu0.08_aligned.npy',k_LR_01)
-    np.save('MAC_kLR10_dmu0.08_aligned.npy',k_LR_10)
-    np.save('MAC_kRL01_dmu0.08_aligned.npy',k_RL_01)
-    np.save('MAC_kRL10_dmu0.08_aligned.npy',k_RL_10)
+    np.save('MAC_kLR01_dmu0.005_aligned.npy',k_LR_01)
+    np.save('MAC_kLR10_dmu0.005_aligned.npy',k_LR_10)
+    np.save('MAC_kRL01_dmu0.005_aligned.npy',k_RL_01)
+    np.save('MAC_kRL10_dmu0.005_aligned.npy',k_RL_10)
 
     k_01 = k_LR_01 + k_RL_01
     k_10 = k_LR_10 + k_RL_10
@@ -140,7 +120,7 @@ if __name__ == '__main__':
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
 
-    np.save('MAC_current_non-dis_dmu0.08_aligned.npy', current)
+    np.save('MAC_current_non-dis_dmu0.005_aligned.npy', current)
 
     plt.plot(temp_grid,current[0,-1,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,:],'r-',lw=0.8)
@@ -158,7 +138,7 @@ if __name__ == '__main__':
     p0 = 1 - p1
 
     current = p1 * (k_LR_10 - k_RL_10) + p0 * (k_LR_01 - k_RL_01)
-    np.save('MAC_current_dis_dmu0.08_aligned.npy', current)
+    np.save('MAC_current_dis_dmu0.005_aligned.npy', current)
 
     plt.plot(temp_grid,current[0,-1,:],'b-',lw=0.8)
     plt.plot(temp_grid,current[-1,-1,:],'r-',lw=0.8)

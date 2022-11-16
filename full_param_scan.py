@@ -63,7 +63,12 @@ if __name__ == '__main__':
 
     pp = ParameterParser(param_file)
 
-    e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
+    e_d0, e_a0, gamL, gamR, gam_phonon = pp.load_intrinsic()
+
+    e_a = e_d0
+    e_d = e_a0
+
+
 
     print(e_d)
     print(e_a)
