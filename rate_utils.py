@@ -1,3 +1,7 @@
+import numpy as np
+from time import perf_counter
+
+
 def lor(e,gamma,e0):
     return gamma / ( (e-e0)*(e-e0) + gamma*(gamma/4)  )
 
