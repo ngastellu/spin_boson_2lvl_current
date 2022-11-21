@@ -11,23 +11,23 @@ from rate_utils import *
    
 kB = 8.617e-5 # eV/K
 
-outdir = 'MAC_aligned_focused_max_dmu0.02_no_shift_all_switch'
+outdir = 'MAC_aligned_laser-focused_max_dmu0.02_no_shift'
 
 if not path.isdir(outdir):
     mkdir(outdir)
 
 
-param_file = 'aligned_focused_max_dmu0.02.json'
+param_file = 'aligned_laser-focused_max_dmu0.02.json'
 
 pp = ParameterParser(param_file)
 
-e_d0, e_a0, gamL0, gamR0, gam_phonon = pp.load_intrinsic()
+e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
 
-gamL = gamR0
-gamR = gamL0
+# gamL = gamR0
+# gamR = gamL0
 
-e_a = e_d0
-e_d = e_a0
+# e_a = e_d0
+# e_d = e_a0
 
 
 

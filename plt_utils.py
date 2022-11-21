@@ -38,7 +38,6 @@ def histogram(values,nbins=100,normalised=False,xlabel=None,ylabel=None,show=Tru
 
     if normalised:
         hist /= values.size #sum of the bin counts will be equal to 1
-        print(np.max(hist))
     
     if plt_kwargs: # Note: plt_kwargs is a dictionary of keyword arguments
         if 'color' in plt_kwargs:
