@@ -23,25 +23,22 @@ pp = ParameterParser(param_file)
 
 e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
 
-# gamL = gamR0
-# gamR = gamL0
-
-# e_a = e_d0
-# e_d = e_a0
-
-
-
-print(e_d)
-print(e_a)
-
 kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
     pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
         'temperature_grid', 'energy_grid'])
 
 beta_grid = 1.0 / (kB * temp_grid)
 
-muL_grid *= -1.0
+# **** The ol' switcharoo happens here ****
 
+# gamL = gamR0
+# gamR = gamL0
+# e_a = e_d0
+# e_d = e_a0
+#muL_grid *= -1.0
+
+print(e_d)
+print(e_a)
 
 mm, bb, ee = np.meshgrid(muL_grid,beta_grid,e_grid,indexing='ij',sparse=True)
 
