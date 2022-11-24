@@ -11,8 +11,8 @@
         "muL_grid" : [ 0,0.02,71 ],
         "kappa_grid" : [ 0.01,0.1,11 ],
         "temperature_grid" : [ 40,400,4000 ],
-        "frequency_grid" : [ 0.001,0.1,21 ],
-        "energy_grid" : [ -2,2,10000 ]
+        "frequency_grid" : [ 0.001,0.07,21 ],
+        "energy_grid" : [ -0.5,0.5,10000 ]
     },
 
     "specific" : {
