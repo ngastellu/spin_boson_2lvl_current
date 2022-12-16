@@ -11,7 +11,7 @@ from rate_utils import *
    
 kB = 8.617e-5 # eV/K
 
-outdir = 'MAC_aligned_laser-focused_max_dmu0.02_no_shift'
+outdir = 'MAC_aligned_laser-focused_max_dmu0.02_no_shift_mol_switch'
 
 if not path.isdir(outdir):
     mkdir(outdir)
@@ -21,7 +21,7 @@ param_file = 'aligned_laser-focused_max_dmu0.02.json'
 
 pp = ParameterParser(param_file)
 
-e_d, e_a, gamL, gamR, gam_phonon = pp.load_intrinsic()
+e_d0, e_a0, gamL0, gamR0, gam_phonon = pp.load_intrinsic()
 
 kappa_grid, w0_grid, muL_grid, temp_grid, e_grid = \
     pp.load_grids(plist=['kappa_grid', 'frequency_grid','muL_grid',\
@@ -31,10 +31,10 @@ beta_grid = 1.0 / (kB * temp_grid)
 
 # **** The ol' switcharoo happens here ****
 
-# gamL = gamR0
-# gamR = gamL0
-# e_a = e_d0
-# e_d = e_a0
+gamL = gamR0
+gamR = gamL0
+e_a = e_d0
+e_d = e_a0
 #muL_grid *= -1.0
 
 print(e_d)
